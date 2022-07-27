@@ -1,0 +1,172 @@
+// MongoDB Playground
+// Use Ctrl+Space inside a snippet or a string literal to trigger completions.
+const database = 'Project';
+const collection = 'Films';
+
+// Create a new database.
+use('Project');
+
+// Create a new collection.
+db.createCollection('Films');
+
+//1 - Crie uma coleção chamada Filmes que contenha os seguintes campos:
+//- Nome, Diretor, Elenco, Ano, Prêmios
+use ('Project')
+
+db.Films.insertMany(
+  [  
+{nome:"Duna",
+diretor:"Denis Villeuneve",
+elenco:"Timothée Chalamet, Rebecca Ferguson, Zendaya",
+ano:2021, 
+premios:0},
+
+{nome:"Central do Brasil",
+diretor:"Walter Salles",
+elenco:"Fernanda, Montenegro, Vinicius de Oliveira", 
+ano: 1908,
+premios:20},
+
+{nome:"Cidade dos Sonhos",
+diretor:"David Lynch",
+elenco:"Naomi Watts, Laura, Elena Harring",
+ano:2001,
+premios:18},
+
+{nome:"King Kong",
+diretor:"Peter Jackson",
+elenco:"Naomi Watts, Jack Black, Adrien Brody",
+ano:2005,
+premios:10},
+
+{nome:"Bela Vingança",
+diretor:"Emerald Fennel",
+elenco:"Carey Mulligan, Bo Burnham",
+ano:2020,
+premios:22},
+
+{nome:"SDA: A Sociedadedo Anel",
+diretor:"Peter Jackson",
+elenco:"Elijah Wood, Ian McKellen, Liv Tyler",
+ano:2001,
+premios:15},
+
+{nome:"Shrek",
+diretor:"Andrew Adamson Vicky Jenson",
+elenco:"Mike Myers, Eddie Murphy, Cameron Diaz",
+ano:2001,
+premios:10},
+
+{nome:"Cidade de Deus",
+diretor:"Fernando Meirelles, Kátia Luind",
+elenco:"Alexandre Rodrigues, Leandro Firmino da Hora",
+ano:2002,
+premios:15},
+
+{nome:"Pânico",
+diretor:"Wes Craven",
+elenco:"Neve Campbell, Courtney Cox, David Arquette",
+ano:1996,
+premios:6},
+]
+)
+
+use('Project')
+db.Films.find({})
+ 
+ //2 - Busque filmes lançados entre 1997 e 2004.
+
+use('Project')
+db.Films.find(
+    { ano:{$gte: ('1997'), $lte: ('2004')}
+    }
+    )
+
+//3 - Busque filmes de 2001 ou que comecem com a letra D.
+
+use('Project')
+db.Films.find(
+  {$or:
+    [
+      {ano: 2001},
+      {nome: /^D/}
+    ]
+    }
+    )
+
+//4-Busque filmes lançados dirigidos pelo Peter Jackson ou pelo Walter Salles usando $in.
+
+use('Project')
+db.Films.find(
+    {"diretor":{"$in":['Peter Jackson','Walter Salles']}
+    }
+    ) 
+
+//5-Busque filmes lançados entre 2002 e 2021 e que contenham as atrizes Naomi Watts ou Carey Mulligan.
+
+use('Project')
+db.Films.find(
+  {$and:
+    [
+      {ano: { $gte:2002, $lte:2021}},
+      {elenco: { $in:[/^Naomi Watts/, /^Carey Mulligan/]}
+       }
+    ]
+    }
+    )
+
+//6-Busque todos os filmes que não sejam entre 2001 e 2005.
+
+use('Project')
+db.Films.find(
+    { ano: { $ne: ('2001'), $ne: ('2005') }}
+    )
+
+//7-Conte quantos filmes foram lançados em 2001.
+
+use('Project')
+db.Films.find(
+  {ano: {$eq: 2001}}).count()
+
+//8-Selecione apenas o elenco numa distinct
+
+use('Project')
+db.Films.distinct('elenco')
+
+//9-Selecione os filmes lançados em 2001, apresentando seu nome e diretor apenas, em ordem decrescente, limitando a dois resultados.
+
+use('Project')
+db.Films.find(
+    {ano: {$eq: 2001}},
+    {nome:1, _id:0, diretor:1}).sort({diretor:-1}).limit(2)
+
+//10-Crie uma index usando o ano como referência.
+
+use('Project')
+db.Films.createIndex({ano: 1})
+
+//11-Some os prêmios de todos os filmes
+
+use('Project')
+db.Films.aggregate(
+   [{
+      $group:
+        {_id:null, totalAmount: {$sum:'$premios'}}
+    }]
+    )
+
+//12-Na coleção `sample_mflix` do Mongo Atlas DB, crie uma consulta que retorne os filmes com os seus
+// comentários utilizando o estágio de agrupamento (e.g.: `$lookup`) 
+
+use('sample_mflix')
+db.Films.aggregate(
+    [{
+$lookup:
+     {
+       from: "movies",
+       localField: "text",
+       foreignField: "title",
+       as: "comments"
+       }
+}]
+)
